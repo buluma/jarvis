@@ -146,7 +146,7 @@ PYAUTOGUI = {
     "name": "pyautogui",
     "pip": ['pyautogui'],
     "description": "Required for automation (e.g. automatic key presses)",
-    "instrauction": ""
+    "instruction": "Required only by desktop automation commands."
 }
 
 
@@ -154,20 +154,23 @@ AKINATOR = {
     "name": "akinator.py",
     "pip": ['akinator.py'],
     "description": "Required for akinator",
-    "instrauction": ""
+    "instruction": "Required only by the Akinator plugin."
 }
 
 
 PYDUB = {
     "name": "pydub",
     "pip": ['pydub', 'shazamio'],
-    "description": "Required for voice / music recognision",
-    "instrauction": ""
+    "description": "Required for music recognition",
+    "instruction": "Required only by the music-recognition plugin."
 }
 
 
 
-OPTIONAL_REQUIREMENTS = [PortAudio, RequestsSecurity, FFMPEG, ESPEAK, WKHTMLTOPDF, Fasttext, HTOP, AKINATOR, PYDUB]
+OPTIONAL_REQUIREMENTS = [
+    PortAudio, RequestsSecurity, FFMPEG, ESPEAK, WKHTMLTOPDF, Fasttext,
+    HTOP, PYAUTOGUI, AKINATOR, PYDUB
+]
 
 
 if not sys.platform == "darwin":

@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 
 import os
-from colorama import Fore
 import re
+from difflib import get_close_matches
+from colorama import Fore
 import sys
 import tempfile
-from utilities.GeneralUtilities import print_say
 from CmdInterpreter import CmdInterpreter
 
 # register hist path
@@ -34,10 +34,13 @@ class Jarvis(CmdInterpreter, object):
     # allows Jarvis say "Hi", only at the first interaction.
     first_reaction_text = ""
     first_reaction_text += Fore.CYAN + \
-        'Jarvis\' sound is by default disabled.' + Fore.RESET
+        'Speech output is disabled by default.' + Fore.RESET
     first_reaction_text += "\n"
-    first_reaction_text += Fore.CYAN + 'In order to let Jarvis talk out loud type: '
+    first_reaction_text += Fore.CYAN + 'To enable spoken replies, type: '
     first_reaction_text += Fore.RESET + Fore.MAGENTA + 'enable sound' + Fore.RESET
+    first_reaction_text += "\n"
+    first_reaction_text += Fore.CYAN + \
+        "For microphone input, use 'hear' after installing optional audio support." + Fore.RESET
     first_reaction_text += "\n"
     first_reaction_text += Fore.CYAN + \
         "Type 'help' for a list of available actions." + Fore.RESET
@@ -75,10 +78,43 @@ class Jarvis(CmdInterpreter, object):
 
     def default(self, data):
         """Jarvis let's you know if an error has occurred."""
-        print_say("I could not identify your command...", self, Fore.MAGENTA)
+        requested = getattr(self, "_last_user_input", data).strip()
+        normalized = re.sub(r"[^\w\s]", "", requested.lower()).strip()
+        command_names = self._command_names()
+        suggestions = get_close_matches(
+            normalized, sorted(command_names), n=3, cutoff=0.68
+        )
+        if suggestions:
+            formatted = ", ".join(f"'{command}'" for command in suggestions)
+            self.say(
+                f"I couldn't identify '{requested}'. Did you mean {formatted}?",
+                Fore.MAGENTA,
+            )
+        else:
+            self.say(
+                f"I couldn't identify '{requested}'. Type 'help' for commands.",
+                Fore.MAGENTA,
+            )
+
+    def _command_names(self):
+        """Return registered leaf commands and built-in command names."""
+        names = {"help", "status", "exit", "quit", "goodbye"}
+
+        def collect(storage, prefix=()):
+            for part, action in storage.items():
+                command = prefix + (part,)
+                if action.is_callable_plugin():
+                    names.add(" ".join(command))
+                children = action.get_plugins()
+                if children:
+                    collect(children, command)
+
+        collect(self._plugin_manager.get_plugins())
+        return names
 
     def precmd(self, line):
         """Hook that executes before every command."""
+        self._last_user_input = line.strip()
         words = line.split()
         HISTORY_FILENAME.write(line + '\n')
 
@@ -138,36 +174,25 @@ class Jarvis(CmdInterpreter, object):
     def find_action(self, data, actions):
         """Checks if input is a defined action.
         :return: returns the action"""
-        output = "None"
         if not actions:
-            return output
+            return "None"
 
-        action_found = False
+        action_names = set(actions)
         words = data.split()
-        actions = list(actions)
+        if "near" in words:
+            near_index = words.index("near")
+            initial_words = words[:near_index]
+            remaining_words = words[near_index + 1:]
+            return "near " + " ".join(
+                initial_words + ["|"] + remaining_words
+            )
 
-        # return longest matching word
-        # TODO: Implement real and good natural language processing
-        # But for now, this code returns acceptable results
-        actions.sort(key=lambda l: len(l), reverse=True)
-
-        # check word by word if exists an action with the same name
-        for action in actions:
-            words_remaining = data.split()
-            for word in words:
-                words_remaining.remove(word)
-                # For the 'near' keyword, the words before 'near' are also needed
-                if word == "near":
-                    initial_words = words[:words.index('near')]
-                    output = word + " " +\
-                        " ".join(initial_words + ["|"] + words_remaining)
-                elif word == action:  # command name exists
-                    action_found = True
-                    output = word + " " + " ".join(words_remaining)
-                    break
-            if action_found:
-                break
-        return output
+        # Route through the first command word so nested groups work: for
+        # "movie search title", dispatch to `movie` before matching `search`.
+        for index, word in enumerate(words):
+            if word in action_names:
+                return word + " " + " ".join(words[index + 1:])
+        return "None"
 
     def executor(self, command):
         """

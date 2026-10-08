@@ -53,7 +53,7 @@ Jarvis is a simple personal assistant for Linux, MacOS and Windows which works o
     - Enjoy jokes and random facts (`dadjoke`, `joke daily`, `joke chuck`, `joke`, `fact`, `cat fact`)
 
 14. **Calculations**
-    - Perform calculations and solve equations (`calculate`, `factor`, `solve`, `equations`, `plot`, `matrix add`)
+    - Perform calculations and solve equations (`calculate`, `factor`, `prime factors`, `solve`, `equations`, `plot`, `matrix add`)
 
 15. **QR Code Generation**
     - Generate QR codes for URLs (`qr`)
@@ -101,6 +101,14 @@ Jarvis is a simple personal assistant for Linux, MacOS and Windows which works o
    ```
 
 You can start by typing `help` within the Jarvis command line to check what Jarvis can do for you.
+
+### Voice input and output
+
+`enable sound` enables spoken replies. Microphone input is a separate `hear` command and requires the optional SpeechRecognition/PortAudio setup from the installer. Voice input uses Google's speech-recognition service, so captured audio is sent to that service for transcription.
+
+### Movie database
+
+Movie lookup uses Cinemagoer's local IMDb datasets. Jarvis opens the database on the first movie command, using `JARVIS_IMDB_DATABASE` when set or a per-user data directory otherwise; it does not create a database in the project folder. Download IMDb's non-commercial datasets and import them with Cinemagoer's `s32cinemagoer.py` tool before using movie lookup. See [Cinemagoer's dataset guide](https://github.com/cinemagoer/cinemagoer/blob/master/docs/usage/s3.rst).
 
 ## ❓Frequently encountered issues
 **Question**: 

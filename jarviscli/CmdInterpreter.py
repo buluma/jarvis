@@ -365,9 +365,11 @@ class CmdInterpreter(Cmd):
             self._api.say(self.first_reaction_text)
 
     def _init_plugin_info(self):
+        import_errors = self._plugin_manager.get_import_errors()
         plugin_status_formatter = {
             "disabled": len(self._plugin_manager.get_disabled()),
             "enabled": self._plugin_manager.get_number_plugins_loaded(),
+            "import_errors": len(import_errors),
             "magenta": Fore.MAGENTA,
             "cyan": Fore.CYAN,
             "reset": Fore.RESET
@@ -375,8 +377,13 @@ class CmdInterpreter(Cmd):
 
         plugin_status = "{magenta}{enabled} {cyan}plugins loaded"
         if plugin_status_formatter['disabled'] > 0:
-            plugin_status += """ {magenta}{disabled} {cyan}plugins disabled.
-            More information: {magenta}status\n"""
+            plugin_status += " {magenta}{disabled} {cyan}plugins disabled."
+        if plugin_status_formatter['import_errors'] > 0:
+            plugin_status += (
+                " {magenta}{import_errors} {cyan}plugin modules unavailable."
+            )
+        if plugin_status_formatter['disabled'] or plugin_status_formatter['import_errors']:
+            plugin_status += " More information: {magenta}status\n"
         plugin_status += Fore.RESET
 
         self.first_reaction_text += plugin_status.format(
@@ -389,14 +396,14 @@ class CmdInterpreter(Cmd):
 
             run_catch = catch_all_exceptions(plugin.run)
             setattr(
-                CmdInterpreter,
+                self,
                 "do_"
                 + plugin_name,
                 partial(
                     run_catch,
                     self))
             setattr(
-                CmdInterpreter,
+                self,
                 "help_" + plugin_name,
                 partial(
                     self._api.say,
@@ -413,7 +420,7 @@ class CmdInterpreter(Cmd):
                     return [i for i in completions if i.startswith(text)]
                 return _complete_impl
             setattr(
-                CmdInterpreter,
+                self,
                 "complete_"
                 + plugin_name,
                 complete(completions))
@@ -448,12 +455,25 @@ class CmdInterpreter(Cmd):
         """Prints plugin status status"""
         count_enabled = self._plugin_manager.get_number_plugins_loaded()
         count_disabled = len(self._plugin_manager.get_disabled())
-        self.say(f"{count_enabled} plugins enabled, {count_disabled} plugins disabled.")
+        import_errors = self._plugin_manager.get_import_errors()
+        self.say(
+            f"{count_enabled} plugins enabled, {count_disabled} plugins disabled, "
+            f"{len(import_errors)} plugin modules unavailable."
+        )
 
         if "short" not in s and count_disabled > 0:
             self.say("")
             for disabled, reason in self._plugin_manager.get_disabled().items():
                 self.say(f"{disabled:<20}: {' OR '.join(reason)}")
+
+        if "short" not in s and import_errors:
+            self.say("\nPlugin import problems:")
+            for module_name, reason in import_errors:
+                self.say(f"{module_name:<28}: {reason}")
+            self.say(
+                "Use the installer for optional Python packages; install native "
+                "libraries using the guide shown with each error."
+            )
 
 
     def do_help(self, arg):

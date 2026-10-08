@@ -1,12 +1,49 @@
+import os
+from pathlib import Path
+
 import imdb
 from colorama import Fore, Style
-from plugin import plugin, require
+from plugin import plugin
 from functools import lru_cache
+from utilities.app_data import user_data_dir
 
-app = imdb.IMDb()
+app = None
+
+
+def movie_database_path():
+    """Return the configured Cinemagoer database path, outside the checkout."""
+    configured_path = os.environ.get("JARVIS_IMDB_DATABASE")
+    if configured_path:
+        return Path(configured_path).expanduser()
+    return user_data_dir() / "cinemagoer.db"
+
+
+def get_imdb(jarvis):
+    """Open the user's imported IMDb dataset only when a movie command is used."""
+    global app
+    if app is not None:
+        return app
+
+    database_path = movie_database_path()
+    if not database_path.is_file():
+        jarvis.say(
+            "Movie lookup needs a Cinemagoer database. Set "
+            "JARVIS_IMDB_DATABASE to an imported database; see the README."
+        )
+        return None
+
+    database_uri = "sqlite:///" + database_path.resolve().as_posix()
+    try:
+        app = imdb.IMDb("s3", uri=database_uri)
+    except Exception as exc:
+        jarvis.say(f"Could not open the movie database: {exc}", Fore.RED)
+        return None
+    return app
 
 
 def main(jarvis, movie):
+    if get_imdb(jarvis) is None:
+        return None
     movie_id = search_movie(jarvis, movie)
 
     if movie_id is None:
@@ -35,7 +72,6 @@ def get_movie_by_id(movie_id):
     return app.get_movie(movie_id)
 
 
-@require(network=True)
 @plugin('movie cast')
 def movie_cast(jarvis, movie):
     """"""
@@ -45,7 +81,6 @@ def movie_cast(jarvis, movie):
             jarvis.say(d['name'])
 
 
-@require(network=True)
 @plugin('movie director')
 def movie_director(jarvis, movie):
     """"""
@@ -55,7 +90,6 @@ def movie_director(jarvis, movie):
             jarvis.say(d['name'])
 
 
-@require(network=True)
 @plugin('movie plot')
 def movie_plot(jarvis, movie):
     """"""
@@ -71,7 +105,6 @@ def movie_plot(jarvis, movie):
                 jarvis.say(d)
 
 
-@require(network=True)
 @plugin('movie producer')
 def movie_producer(jarvis, movie):
     """"""
@@ -81,7 +114,6 @@ def movie_producer(jarvis, movie):
             jarvis.say(d['name'])
 
 
-@require(network=True)
 @plugin('movie rating')
 def movie_rating(jarvis, movie):
     """"""
@@ -90,7 +122,6 @@ def movie_rating(jarvis, movie):
         jarvis.say(str(data['rating']))
 
 
-@require(network=True)
 @plugin('movie year')
 def movie_year(jarvis, movie):
     """"""
@@ -99,7 +130,6 @@ def movie_year(jarvis, movie):
         jarvis.say(str(data['year']))
 
 
-@require(network=True)
 @plugin('movie runtime')
 def movie_runtime(jarvis, movie):
     """"""
@@ -111,7 +141,6 @@ def movie_runtime(jarvis, movie):
             jarvis.say("No runtime data present")
 
 
-@require(network=True)
 @plugin('movie countries')
 def movie_countries(jarvis, movie):
     """"""
@@ -121,7 +150,6 @@ def movie_countries(jarvis, movie):
             jarvis.say(str(d))
 
 
-@require(network=True)
 @plugin('movie genres')
 def movie_genres(jarvis, movie):
     """"""
@@ -131,7 +159,6 @@ def movie_genres(jarvis, movie):
             jarvis.say(d)
 
 
-@require(network=True)
 @plugin('movie info')
 def movie_info(jarvis, movie):
     """
@@ -143,10 +170,11 @@ def movie_info(jarvis, movie):
         get_movie_info(jarvis, data)
 
 
-@require(network=True)
 @plugin('movie search')
 def movie_search(jarvis, movie):
     """ search for a movie on IMDB"""
+    if get_imdb(jarvis) is None:
+        return None
     results = search_movie(jarvis, movie, all_results=True)
 
     # if results is None or empty
