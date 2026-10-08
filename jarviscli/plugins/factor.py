@@ -1,26 +1,39 @@
-import math
-from plugin import plugin
-# A simple plugin to print all prime factors of a given number n
+from plugin import alias, plugin
 
-@plugin("factor")
+
+def prime_factors(number):
+    """Return the prime factors of a positive integer."""
+    if number < 1:
+        raise ValueError("number must be a positive integer")
+    if number == 1:
+        return []
+
+    factors = []
+    divisor = 2
+    while divisor * divisor <= number:
+        while number % divisor == 0:
+            factors.append(divisor)
+            number //= divisor
+        divisor = 3 if divisor == 2 else divisor + 2
+
+    if number > 1:
+        factors.append(number)
+    return factors
+
+
+@alias("factor integer", "prime factorization")
+@plugin("prime factors")
 def factor(jarvis, s):
+    """Print prime factors for a positive integer, such as ``prime factors 84``."""
+    value = s.strip() or jarvis.input("Enter a positive integer: ").strip()
     try:
-        n = int(input("Enter a number for me to factorize: "))
-
-        factors = []
-        while n % 2 == 0:
-            factors.append(2)
-            n = n // 2
-
-        for i in range(3, int(math.sqrt(n)) + 1, 2):
-            while n % i == 0:
-                factors.append(i)
-                n = n // i
-
-        if n > 2:
-            factors.append(n)  # if n is prime
-
-        result = ' x '.join(map(str, factors))
-        jarvis.say(result)
+        number = int(value)
+        factors = prime_factors(number)
     except ValueError:
-        jarvis.say("Invalid input. Please enter a positive integer.")
+        jarvis.say("Please enter a positive integer.")
+        return
+
+    if not factors:
+        jarvis.say("1 has no prime factors.")
+        return
+    jarvis.say(" x ".join(map(str, factors)))

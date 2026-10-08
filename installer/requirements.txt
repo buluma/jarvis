@@ -12,10 +12,9 @@ IMDbPY
 matplotlib
 mock
 nltk
-setuptools<81
 pdfkit
 pick
-pluginmanager
+pluginmanager==0.4.1
 psutil; sys_platform == 'win32'
 pycricbuzz
 pydoc-markdown

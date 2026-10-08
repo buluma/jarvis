@@ -20,6 +20,7 @@ class ProjectHealthTest(unittest.TestCase):
             "plugins.geolocation",
             "plugins.cocktail",
             "plugins.moon_phase",
+            "plugins.flightradar",
         ):
             with self.subTest(module=module_name):
                 self.assertIsNotNone(importlib.import_module(module_name))

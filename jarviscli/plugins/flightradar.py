@@ -1,6 +1,5 @@
+from FlightRadarAPI import FlightRadar24API
 from plugin import plugin, require
-from FlightRadar24.api import FlightRadar24API
-flightapi = FlightRadar24API()
 
 @require(network=True)
 @plugin("flightradar")

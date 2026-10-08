@@ -1,5 +1,8 @@
 from inspect import cleandoc, isclass
 
+from pluginmanager_compat import install_entry_point_compatibility
+
+install_entry_point_compatibility()
 import pluginmanager
 from requests import ConnectionError
 

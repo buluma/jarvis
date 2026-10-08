@@ -1,6 +1,11 @@
 import sys
 from functools import partial
+from pathlib import Path
+from types import ModuleType
 
+from pluginmanager_compat import install_entry_point_compatibility
+
+install_entry_point_compatibility()
 import pluginmanager
 
 import plugin
@@ -18,17 +23,26 @@ class PluginManager(object):
         import pluginmanager.module_manager
         self._backend = pluginmanager.PluginInterface()
 
-        # patch to ignore import exception
+        # Keep missing optional dependencies out of startup output, but expose
+        # enough context through `status` to diagnose or install them.
         _load_source = pluginmanager.module_manager.load_source
+        self._import_errors = getattr(_load_source, "_jarvis_import_errors", None)
+        if self._import_errors is None:
+            self._import_errors = []
 
-        def patched_load_source(*args):
-            try:
-                return _load_source(*args)
-            except ImportError as e:
-                print(e)
-            import sys
-            return sys
-        pluginmanager.module_manager.load_source = patched_load_source
+            def patched_load_source(module_name, file_path):
+                try:
+                    return _load_source(module_name, file_path)
+                except ImportError as exc:
+                    failure = (Path(file_path).name, str(exc))
+                    if failure not in self._import_errors:
+                        self._import_errors.append(failure)
+                    failed_module = ModuleType(module_name)
+                    failed_module.__file__ = file_path
+                    return failed_module
+
+            patched_load_source._jarvis_import_errors = self._import_errors
+            pluginmanager.module_manager.load_source = patched_load_source
 
         _handle_class_instance = self._backend.plugin_manager._handle_class_instance
         def patched_handle_class_instance(*args):
@@ -138,7 +152,14 @@ class PluginManager(object):
                     plugin_existing.change_with(plugin_to_add)
                     parent.add_plugin(name, plugin_to_add)
                 else:
-                    error("Duplicated plugin {}!".format(name))
+                    error(
+                        "Duplicate command '{}': '{}' conflicts with '{}'; "
+                        "keeping the first registration.".format(
+                            " ".join(name),
+                            plugin_to_add.get_name(),
+                            plugin_existing.get_name(),
+                        )
+                    )
 
         def add_plugin_compose(
                 name_first,
@@ -196,6 +217,10 @@ class PluginManager(object):
     def get_number_plugins_loaded(self):
         self._load()
         return self._plugins_loaded
+
+    def get_import_errors(self):
+        self._load()
+        return tuple(self._import_errors)
 
 
 class PluginDependency(object):

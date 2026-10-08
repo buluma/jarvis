@@ -15,9 +15,21 @@ else:
         'voice_control_requirements (install portaudio + re-run setup.sh)']
 
 
+def confirm_voice_input(jarvis):
+    jarvis.say(
+        "Voice input sends microphone audio to Google's speech-recognition "
+        "service. Type yes to continue."
+    )
+    return jarvis.input("Continue? [y/N] ").strip().lower() in {"y", "yes"}
+
+
 @require(native=requirements)
 @plugin("hear")
 def hear(jarvis, s):
+    if not confirm_voice_input(jarvis):
+        jarvis.say("Voice input cancelled.")
+        return
+
     r = sr.Recognizer()
     _jarvis = jarvis._jarvis
     

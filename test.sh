@@ -12,13 +12,17 @@ if [[ "${1:-}" == "--all" ]]; then
     python -m unittest discover
 else
     python -m flake8 --select E9,F63,F7,F82 \
-        __main__.py bootstrap.py \
+        __main__.py bootstrap.py pluginmanager_compat.py PluginManager.py \
+        CmdInterpreter.py Jarvis.py \
         plugins/colorconverter.py plugins/geolocation.py plugins/cocktail.py \
         plugins/moon_phase.py plugins/dnd.py plugins/wordle.py plugins/readpdf.py \
         plugins/word_chain_game.py plugins/workspace.py plugins/dictionary.py \
-        plugins/translate.py utilities/GeneralUtilities.py utilities/nltk_loader.py \
-        tests/test_project_health.py tests/test_lazy_cv2.py \
-        ../installer/steps/a_setup_virtualenv.py \
+        plugins/translate.py plugins/factor.py plugins/evaluator.py plugins/greeting.py \
+        plugins/movie.py plugins/voice_control.py utilities/GeneralUtilities.py utilities/nltk_loader.py \
+        utilities/app_data.py tests/test_project_health.py tests/test_lazy_nltk.py \
+        tests/test_lazy_cv2.py tests/test_startup_experience.py \
+        ../installer/steps/a_setup_virtualenv.py ../installer/optional.py \
         ../installer/unix_windows.py
-    python -m unittest tests.test_project_health tests.test_lazy_nltk tests.test_lazy_cv2
+    python -m unittest tests.test_project_health tests.test_lazy_nltk \
+        tests.test_lazy_cv2 tests.test_startup_experience
 fi
