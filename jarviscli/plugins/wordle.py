@@ -1,6 +1,7 @@
 from colorama import Fore
 from plugin import plugin
 import random
+from pathlib import Path
 
 """
 simple WORDLE game
@@ -63,8 +64,9 @@ def wordle(guesses, answers, jarvis):
         jarvis.say("Game over. The secret word was: " + secret_word, Fore.RED)
 
 
-answers_dictionary = 'jarviscli/data/wordle_files/answers.txt'
-guesses_dictionary = 'jarviscli/data/wordle_files/guesses.txt'
+DATA_DIRECTORY = Path(__file__).resolve().parents[1] / 'data' / 'wordle_files'
+answers_dictionary = DATA_DIRECTORY / 'answers.txt'
+guesses_dictionary = DATA_DIRECTORY / 'guesses.txt'
 
 guesses = load_dictionary(guesses_dictionary)
 answers = load_dictionary(answers_dictionary)

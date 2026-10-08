@@ -1,17 +1,24 @@
 from plugin import plugin
 import requests
-import json
 import random
-import nltk
 from nltk.corpus import words
 
-nltk.download('words')
-english_words = set(words.words())
+def load_english_words():
+    """Load the optional word-chain dictionary without downloading on startup."""
+    try:
+        return set(words.words())
+    except LookupError:
+        return None
 
 @plugin("word chain game")
 def word_chain_game(jarvis, s):
     if s:
         jarvis.say("This command does not take arguments. Just type 'word chain game' to start.")
+        return
+
+    english_words = load_english_words()
+    if english_words is None:
+        jarvis.say("The word list is missing. Re-run the Jarvis installer to download it.")
         return
 
     def is_valid_word(word_to_check):

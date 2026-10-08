@@ -12,7 +12,7 @@ IMDbPY
 matplotlib
 mock
 nltk
-pathlib2; python_version < '3.4'
+setuptools<81
 pdfkit
 pick
 pluginmanager
@@ -39,12 +39,11 @@ whois
 wikipedia
 win10toast; sys_platform == 'win32'
 gtts
-playsound==1.2.2 ; python_version < "3.12"
-git+https://github.com/taconi/playsound.git#egg=playsound ; python_version >= "3.12"
 windows-curses; sys_platform == 'win32'
 Image
 img2pdf
 pdf2image
+pypdf
 python-nmap
 yeelight
 haversine

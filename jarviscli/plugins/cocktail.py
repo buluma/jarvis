@@ -2,7 +2,7 @@ from colorama import Fore
 from plugin import plugin, require, alias
 import requests
 import json
-import os
+import shutil
 
 
 @require(network=True)
@@ -15,7 +15,7 @@ class Cocktail:
 
     def __init__(self):
         # get the width of terminal
-        self.SCREEN_WIDTH = os.get_terminal_size().columns
+        self.SCREEN_WIDTH = shutil.get_terminal_size((80, 24)).columns
         self.RECIPE_WIDTH = 60
         self.MARGIN = round((self.SCREEN_WIDTH - self.RECIPE_WIDTH) / 2) + 1
         self.ingredients = [
