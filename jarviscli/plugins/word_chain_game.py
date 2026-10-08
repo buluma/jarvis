@@ -1,12 +1,12 @@
 from plugin import plugin
 import requests
 import random
-from nltk.corpus import words
+from utilities.nltk_loader import load_nltk
 
 def load_english_words():
     """Load the optional word-chain dictionary without downloading on startup."""
     try:
-        return set(words.words())
+        return set(load_nltk().corpus.words.words())
     except LookupError:
         return None
 

@@ -15,8 +15,9 @@ else
         __main__.py bootstrap.py \
         plugins/colorconverter.py plugins/geolocation.py plugins/cocktail.py \
         plugins/moon_phase.py plugins/dnd.py plugins/wordle.py plugins/readpdf.py \
-        plugins/word_chain_game.py plugins/workspace.py utilities/GeneralUtilities.py \
+        plugins/word_chain_game.py plugins/workspace.py plugins/dictionary.py \
+        plugins/translate.py utilities/GeneralUtilities.py utilities/nltk_loader.py \
         tests/test_project_health.py ../installer/steps/a_setup_virtualenv.py \
         ../installer/unix_windows.py
-    python -m unittest tests.test_project_health
+    python -m unittest tests.test_project_health tests.test_lazy_nltk
 fi

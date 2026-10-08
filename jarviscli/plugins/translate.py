@@ -1,7 +1,7 @@
 from plugin import plugin, require, alias
 from googletrans import Translator
 from googletrans.constants import LANGCODES, LANGUAGES, SPECIAL_CASES
-import nltk
+from utilities.nltk_loader import load_nltk
 import asyncio
 import os
 
@@ -24,7 +24,7 @@ def translate(jarvis, s):
 
     #   Check whether user has entered translate by itself or with extra parameters
     if s != "":
-        words = nltk.word_tokenize(s.lower())
+        words = load_nltk().word_tokenize(s.lower())
         currentPos = 0
         finalPos = 0
         srcs = None

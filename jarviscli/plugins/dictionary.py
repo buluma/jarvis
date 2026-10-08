@@ -1,8 +1,5 @@
-import nltk
-from nltk.corpus import wordnet
 from plugin import plugin
-
-nltk.data.path.append("jarviscli/data/ntlk")
+from utilities.nltk_loader import load_nltk
 
 
 @plugin('dictionary')
@@ -10,6 +7,7 @@ def dictionary(jarvis, s):
     """
     Get meaning, synonym and antonym of any word
     """
+    wordnet = load_nltk().corpus.wordnet
     if len(s) == 0:
         jarvis.say('\nEnter word')
         word = jarvis.input()

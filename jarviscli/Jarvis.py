@@ -2,7 +2,6 @@
 
 import os
 from colorama import Fore
-import nltk
 import re
 import sys
 import tempfile
@@ -66,9 +65,6 @@ class Jarvis(CmdInterpreter, object):
         work_dir = os.path.dirname(__file__)
         # remove 'jarviscli/' from path
         work_dir = os.path.dirname(work_dir)
-
-        # fix nltk path
-        nltk.data.path.append(os.path.join(work_dir, "jarviscli/data/nltk"))
 
         # relative -> absolute paths
         for directory in dirs:
