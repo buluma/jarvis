@@ -1,8 +1,10 @@
 # Jarvis
 
-[![Build Status](https://travis-ci.org/sukeesh/Jarvis.svg?branch=master)](https://travis-ci.org/sukeesh/Jarvis) [![Join the chat at https://gitter.im/Sukeesh_Jarvis/Lobby](https://badges.gitter.im/Sukeesh_Jarvis/Lobby.svg)](https://gitter.im/Sukeesh_Jarvis/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Python CI](https://github.com/buluma/jarvis/actions/workflows/python-ci.yml/badge.svg)](https://github.com/buluma/jarvis/actions/workflows/python-ci.yml)
 
 A Personal Non-AI Assistant for Linux, MacOS and Windows
+
+Jarvis requires Python 3.10 or newer. CI checks Python 3.10 and 3.13.
 
 ![Jarvis](http://i.imgur.com/xZ8x9ES.jpg)
 
@@ -72,7 +74,7 @@ Jarvis is a simple personal assistant for Linux, MacOS and Windows which works o
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/sukeesh/Jarvis.git
+   git clone https://github.com/buluma/jarvis.git
    ```
 
 2. **Run the installer**
@@ -120,15 +122,10 @@ Error: `ImportError: DLL load failed while importing win32api: The specified mod
 
 -----
 
-**Question**: After cloning the repo in terminal it gives an error when running python3 installer saying please install virtual environemnt.
+**Question**: The installer cannot create a Python environment.
 
 **Solution**: 
-- Install virtual env using this command:
-  ```bash
-  python3 -m pip install virtualenv
-  ```
-- OR: On Linux use package manager (e.g. Ubuntu sudo apt install python3-venv)
-  
+- Ensure Python 3 is installed with its built-in `venv` module. On Ubuntu, install it with `sudo apt install python3-venv`.
 - Restart Installer
 
 -----
@@ -181,14 +178,14 @@ Creating a test is optional but never a bad idea ;).
 
 ### How to run tests:
 
- Run `test.sh`
+ Run the offline regression checks with `test.sh`. The older full suite, which includes live-service tests, is available with `test.sh --all`.
  ```bash
  ./test.sh
  ```
 ## Optional Dependencies
 
 - Any pyttsx3 text-to-speech engine (``sapi5, nsss or espeak``) for Jarvis to talk out loud (e.g. Ubuntu do ``sudo apt install espeak``)
-- Portaudio + python-devel packages for voice control
+- PortAudio development headers for optional voice input; the installer installs the Python audio packages
 - ``notify-send`` on Linux if you want to receive *nice* and desktop-notification instead of *ugly* pop up windows (e.g. Ubuntu do ``sudo apt install libnotify-bin``)
 - ``ffmpeg`` if you want ``music`` to download songs as .mp3 instead of .webm
 

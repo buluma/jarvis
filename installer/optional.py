@@ -26,23 +26,19 @@ LinuxDistroRecognition = {
 
 PortAudio = {
     "name": "Voice Recorder",
-    "pip": [
-        'SpeechRecognition',
-        "pyaudio --global-option='build_ext' --global-option='-I/usr/local/include' --global-option='-L/usr/local/lib'"],
+    "pip": ["SpeechRecognition[audio]"],
     "package_guess": {
         "macos": 'portaudio',
         "linux": {
-            'redhat': 'python3-pyaudio python3-devel',
-            'arch': 'python-pyaudio',
-            'gentoo': 'pyaudio',
-            'suse': 'python3-PyAudio python3-devel',
-            'debian': 'python3-pyaudio python3-dev'
+            'redhat': 'portaudio-devel python3-devel',
+            'arch': 'portaudio',
+            'gentoo': 'portaudio',
+            'suse': 'portaudio-devel python3-devel',
+            'debian': 'portaudio19-dev python3-dev'
         }},
     "description": "Required for voice control and music recognition",
     "instruction": """\
-Please install python-binding 'pyaudio' manually."
-For more details go to the below link:
-https://people.csail.mit.edu/hubert/pyaudio/"""}
+Install PortAudio development headers before installing the Python audio extra."""}
 
 
 RequestsSecurity = {

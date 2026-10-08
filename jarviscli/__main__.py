@@ -1,7 +1,16 @@
 # -*- coding: utf-8 -*-
+import sys
+
+if __package__:
+    from .bootstrap import prepare_import_paths
+else:
+    from bootstrap import prepare_import_paths
+
+prepare_import_paths(__file__)
+
 import Jarvis
 import colorama
-import sys
+
 from jarviscli.plugins.message import send_join_message
 
 

@@ -77,9 +77,9 @@ def color_converter(jarvis, s):
 
     # RGB conversion
     elif original_format == 'rgb':
-        try:Ò
+        try:
             rgb = tuple(map(int, color_value.split(',')))
-            if any(not (0 <= x <= 255) for x in rgb):
+            if len(rgb) != 3 or any(not (0 <= x <= 255) for x in rgb):
                 raise ValueError
         except ValueError:
             jarvis.say("Invalid RGB format. Please provide as R,G,B (0-255).")
@@ -96,7 +96,7 @@ def color_converter(jarvis, s):
     elif original_format == 'hsl':
         try:
             hsl = tuple(map(int, color_value.split(',')))
-            if not (0 <= hsl[0] <= 360) or not (0 <= hsl[1] <= 100) or not (0 <= hsl[2] <= 100):
+            if len(hsl) != 3 or not (0 <= hsl[0] <= 360) or not (0 <= hsl[1] <= 100) or not (0 <= hsl[2] <= 100):
                 raise ValueError
         except ValueError:
             jarvis.say(

@@ -1,11 +1,17 @@
 # importing the modules
-import PyPDF2
-import pyttsx3
+from pypdf import PdfReader
 from plugin import plugin
 
-"""
-A tool for reading out the pdf files using the jarvis.Uses PyPDF2 and pyttsx3 libraries
-"""
+"""Read PDF text through Jarvis's normal output and speech interface."""
+
+
+def extract_page_text(filename):
+    """Return text for each page in a PDF, preserving empty pages."""
+    reader = PdfReader(filename)
+    try:
+        return [page.extract_text() or "" for page in reader.pages]
+    finally:
+        reader.close()
 
 
 @plugin('readpdf')
@@ -19,13 +25,6 @@ class readpdfjarvis():
 
     def read_pdf(self, jarvis):
         filename = jarvis.input("Enter your file path with '/' separations:")
-        pdf = open(filename, 'rb')
-        pdfRead = PyPDF2.PdfFileReader(pdf)
-        for i in range(pdfRead.getNumPages()):
-            page = pdfRead.getPage(i)
-            jarvis.say("Page No: " + str(1 + pdfRead.getPageNumber(page)))
-            pageContent = page.extractText()
-            jarvis.say(pageContent)
-        speak = pyttsx3.init()
-        speak.say(pageContent)
-        speak.runAndWait()
+        for page_number, page_content in enumerate(extract_page_text(filename), start=1):
+            jarvis.say("Page No: {}".format(page_number))
+            jarvis.say(page_content)
