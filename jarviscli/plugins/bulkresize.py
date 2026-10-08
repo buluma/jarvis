@@ -1,6 +1,5 @@
 import os
 
-import cv2
 from colorama import Fore
 
 from plugin import plugin
@@ -143,6 +142,9 @@ def output_path_concat(path, im_path):
 
 def bulk_resizer(input_path, output_path, desired_size=32,
                  color=None, rename=True):
+    # cv2 is large to import and only needed here, so load it on first resize
+    import cv2
+
     if color is None:
         color = [0, 0, 0]
     filepath = list_contents(input_path)
